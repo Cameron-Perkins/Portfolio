@@ -1,0 +1,98 @@
+# This is the file where we test our functions.
+import Player_Class
+
+user = Player_Class.Player('test', [], 1000)
+
+test_cases = [
+    # Royal Flush (5)
+    (['A♠','K♠','Q♠','J♠','10♠'], "01 Royal Flush"),
+    (['A♥','K♥','Q♥','J♥','10♥'], "02 Royal Flush"),
+    (['A♦','K♦','Q♦','J♦','10♦'], "03 Royal Flush"),
+    (['A♣','K♣','Q♣','J♣','10♣'], "04 Royal Flush"),
+    (['A♠','K♠','Q♠','J♠','10♠'], "05 Royal Flush (duplicate for consistency)"),
+
+    # Straight Flush (5)
+    (['9♥','8♥','7♥','6♥','5♥'], "06 Straight Flush"),
+    (['6♣','5♣','4♣','3♣','2♣'], "07 Straight Flush (Ace low possible)"),
+    (['K♦','Q♦','J♦','10♦','9♦'], "08 Straight Flush"),
+    (['8♠','7♠','6♠','5♠','4♠'], "09 Straight Flush"),
+    (['7♥','6♥','5♥','4♥','3♥'], "10 Straight Flush"),
+    (['A♥','K♥','Q♥','J♥','10♥'], "10 Straight Flush"),
+
+    # Four of a Kind (5)
+    (['9♦','9♠','9♣','9♥','2♦'], "11 Four of a Kind"),
+    (['A♠','A♦','A♣','A♥','K♦'], "12 Four of a Kind"),
+    (['5♠','5♥','5♦','5♣','10♠'], "13 Four of a Kind"),
+    (['2♣','2♦','2♥','2♠','J♣'], "14 Four of a Kind"),
+    (['Q♠','Q♥','Q♦','Q♣','3♣'], "15 Four of a Kind"),
+
+    # Full House (5)
+    (['3♣','3♦','3♠','6♥','6♣'], "16 Full House"),
+    (['K♠','K♦','K♣','2♥','2♣'], "17 Full House"),
+    (['10♥','10♦','10♠','7♣','7♠'], "18 Full House"),
+    (['J♣','J♦','J♥','9♠','9♦'], "19 Full House"),
+    (['4♠','4♦','4♣','A♥','A♣'], "20 Full House"),
+
+    # Flush (5)
+    (['2♥','5♥','9♥','K♥','7♥'], "21 Flush"),
+    (['A♦','10♦','7♦','4♦','3♦'], "22 Flush"),
+    (['Q♣','J♣','8♣','6♣','2♣'], "23 Flush"),
+    (['9♠','7♠','5♠','3♠','2♠'], "24 Flush"),
+    (['K♥','J♥','8♥','6♥','5♥'], "25 Flush"),
+
+    # Straight (5)
+    (['5♣','4♦','3♠','2♥','A♦'], "26 Straight (Ace low)"),
+    (['10♠','J♦','Q♥','K♣','A♣'], "27 Straight (Ace high)"),
+    (['9♠','8♣','7♦','6♥','5♠'], "28 Straight"),
+    (['7♠','6♣','5♦','4♥','3♠'], "29 Straight"),
+    (['Q♠','J♦','10♣','9♥','8♠'], "30 Straight"),
+
+    # Three of a Kind (5)
+    (['8♠','8♦','8♣','Q♥','2♦'], "31 Three of a Kind"),
+    (['J♠','J♦','J♣','4♥','9♣'], "32 Three of a Kind"),
+    (['A♣','A♠','A♦','10♠','7♦'], "33 Three of a Kind"),
+    (['6♥','6♠','6♦','K♣','9♥'], "34 Three of a Kind"),
+    (['4♠','4♣','4♦','Q♠','8♥'], "35 Three of a Kind"),
+
+    # Two Pair (5)
+    (['5♣','5♠','9♦','9♥','2♣'], "36 Two Pair"),
+    (['K♣','K♦','3♠','3♥','7♣'], "37 Two Pair"),
+    (['A♠','A♥','J♣','J♦','6♠'], "38 Two Pair"),
+    (['10♠','10♦','8♣','8♥','2♦'], "39 Two Pair"),
+    (['7♠','7♦','4♣','4♥','Q♦'], "40 Two Pair"),
+
+    # One Pair (5)
+    (['7♣','7♦','4♥','9♠','2♦'], "41 One Pair"),
+    (['A♣','A♠','8♦','5♥','3♣'], "42 One Pair"),
+    (['K♥','K♦','6♠','3♣','2♥'], "43 One Pair"),
+    (['Q♣','Q♥','9♦','8♠','4♣'], "44 One Pair"),
+    (['J♠','J♥','5♣','2♦','9♣'], "45 One Pair"),
+
+    # High Card (5)
+    (['A♠','10♦','7♥','5♣','2♠'], "46 High Card"),
+    (['K♣','J♦','8♥','6♠','3♣'], "47 High Card"),
+    (['Q♥','9♠','7♦','4♣','2♣'], "48 High Card"),
+    (['J♣','8♠','5♦','3♥','2♥'], "49 High Card"),
+    (['10♠','7♣','6♥','4♦','2♠'], "50 High Card"),
+]
+
+
+def run_tests(evaluate_hand, test_cases):
+    for cards, label in test_cases:
+        # convert to numeric ranks (example, adjust to your mapping)
+        rank_map = {'2':2, '3':3, '4':4, '5':5, '6':6,
+                    '7':7, '8':8, '9':9, '10':10,
+                    'J':11, 'Q':12, 'K':13, 'A':14}
+        ranks = sorted([rank_map[c[:-1]] for c in cards], reverse=True)
+
+        result = Player_Class.evaluate_hand(cards)  # your function should return (score, highcard)
+
+        print(f"Test {label}")
+        print(f"  Cards:   {cards}")
+        print(f"  Ranks:   {ranks}")
+        print(f"  Result:  {result}")
+        print("-" * 40)
+
+run_tests(user.hand, test_cases)
+
+user.hand = []
