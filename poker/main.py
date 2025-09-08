@@ -10,7 +10,7 @@ user = Player_Class.Player("Alice", [], 1000)
 names = ['Bob', 'Charles', 'Diana', 'Eddy', 'Fiona', 'Grant', 'Hope']
 
 # This is where the player chooses how many people to play with
-choice = input('How many players do you want to play with enter a number 1-7.')
+choice = input('How many players do you want to play with enter a number 1-7.\n')
 
 # This is where we make the players list which will store all of the information regarding our players.
 players = []

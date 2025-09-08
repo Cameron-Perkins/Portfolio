@@ -159,7 +159,7 @@ class Computer(User):
         moves = ['fold', 'check', 'raise']
 
         choice = rd.choice(moves)
-        print('Amount of money before player' + self.name +'made a bet is' + str(pot_amount))
+        print('Amount of money before player ' + self.name + ' made a bet is ' + str(pot_amount))
         if choice == 'fold':
             return self.fold(call_amount, pot_amount)
         elif choice == 'check':
@@ -188,7 +188,7 @@ class Player(User):
     # This function takes in amount in the pot.
     def make_move(self, pot_amount=0, call_amount=0):
         print('Amount of chips ' + self.name + ' has is ' + str(self.chips))
-        choice = input('Enter your move: 0 to fold, 1 to check, 2 to raise.')
+        choice = input('Enter your move: 0 to fold, 1 to check, 2 to raise.\n')
         # This is the case where the player folds.
         if choice == '0':
             return self.fold(pot_amount, call_amount)
@@ -199,7 +199,7 @@ class Player(User):
         
         # This is the case where the player raises.
         elif choice == '2':
-            print("Input the amount that you want to bet")
+            print("Input the amount that you want to bet.\n")
             bet = int(input())
             bet = max(0 , bet)
             return self.raise_bet(bet, call_amount, pot_amount)
