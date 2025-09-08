@@ -1,6 +1,11 @@
 import Player_Class
 import random as rd
 
+# Players still in next round after folding.
+# Round seems to end after last player instead of when round of betting is over.
+
+# We should make it so the betting function that returns the players list, we 
+
 user = Player_Class.Player("Alice", [], 1000)
 names = ['Bob', 'Charles', 'Diana', 'Eddy', 'Fiona', 'Grant', 'Hope']
 
@@ -46,21 +51,27 @@ while run:
     for i in ['Flop', 'Turn', 'River']:
         # Dealing cards flop cards
         if i == 'Flop':
+            # This is where we will store the cards just put down to put into the players hand.
+            on_table = []
             print('Dealing flop')
+            on_table = [deck.pop() for _ in range(3)]
             for player in players:
-                Player_Class.deal_table_cards(player, 3, deck)
-
+                player.hand += on_table
         # Dealing turn cards
         elif i == 'Turn':
+            on_table = []
+            on_table.append(deck.pop())
             print('Dealing turn')
             for player in players:
-                Player_Class.deal_table_cards(player, 1, deck)
+                player.hand += on_table
 
         # Dealing river cards
         elif i == 'River':
             print('Dealing river')
+            on_table = []
+            on_table.append(deck.pop())
             for player in players:
-                Player_Class.deal_table_cards(player, 1, deck)
+                player.hand += on_table
 
         for player in players:
             print(player.name)
@@ -86,10 +97,6 @@ while run:
     for player in players:
         print(player.hand)
 
-    # Reset
-    for player in players:
-        player.reset()
-
     # This is to remove all players who have no chips and can no longer play.
     i = 0
     while i < len(players):
@@ -99,8 +106,17 @@ while run:
         i+=1
 
 
+    # This deals with a situation where the players have won.
+    # This occures when theres only one player left in players
     if len(players) == 1:
         print(players[0].name + ' wins. Congradulations.') 
         run = False
-    players = safe_players
+    
+    # This is a loop to remove all players that have cashed out.
+    players = [p for p in players if p.chips > 0]
+
+        # Reset
+    for player in players:
+        player.reset()
+    
 print('End of game')

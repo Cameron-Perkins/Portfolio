@@ -18,6 +18,8 @@ class User():
         self.amount_bet = 0
 
     # This is the function to call when folding.
+    # Input is the amount needed to make a call and the amount currently in the pot.
+    # OUTPUT: fold which is the kind of move the new amount in the pot, and the new amount to call
     def fold(self, call_amount, pot_amount):
         print(self.name + ' folded.')
         # Set's the previous move to fold so the computer knows to skip it.
@@ -42,21 +44,14 @@ class User():
     # the current amount in the pot
     # and the new call amount
     def raise_bet(self, bet, call_amount, pot_amount):
-        print(self.name, ' raised')
-        # Need to match call amount
-        # This enusres our to_call is never negative.
         to_call = max(0, call_amount - self.amount_bet)
-        
-        total_bet = to_call + bet
+        total_bet = min(self.chips, to_call + bet)  # never more than chips
 
         self.chips -= total_bet
-
         self.amount_bet += total_bet
         pot_amount += total_bet
-        
-        # This was previously += if there are issues check this
         call_amount = self.amount_bet
-        print('The amount in the pot is now' + str(pot_amount) + ' the amount bet was ' + str(bet))
+
         return 'raise', pot_amount, call_amount
 
     def evaluate_hand(self, hand):
@@ -170,8 +165,12 @@ class Computer(User):
         elif choice == 'check':
             return self.check_or_call(call_amount, pot_amount)
         elif choice == 'raise':
-            bet = rd.randint(20, 20)
+            to_call = max(0 ,call_amount - self.amount_bet)
+            max_raise = self.chips - to_call
             print(self.name + ' raised.')
+            if max_raise <= 0:
+                return self.check_or_call(call_amount, pot_amount)
+            bet = rd.randint(1, max_raise)
             return self.raise_bet(bet, call_amount, pot_amount)
         else:
             print('Invalid input entered. You entered ', choice, ' default to fold.')
@@ -188,6 +187,7 @@ class Player(User):
     # This is the function that will decide what move should be made.
     # This function takes in amount in the pot.
     def make_move(self, pot_amount=0, call_amount=0):
+        print('Amount of chips ' + self.name + ' has is ' + str(self.chips))
         choice = input('Enter your move: 0 to fold, 1 to check, 2 to raise.')
         # This is the case where the player folds.
         if choice == '0':
@@ -199,7 +199,10 @@ class Player(User):
         
         # This is the case where the player raises.
         elif choice == '2':
-            return self.raise_bet(100, call_amount, pot_amount)
+            print("Input the amount that you want to bet")
+            bet = int(input())
+            bet = max(0 , bet)
+            return self.raise_bet(bet, call_amount, pot_amount)
         else:
             print('Invalid input entered. You entered ', choice, ' default to fold.')
             return 0, pot_amount, call_amount
@@ -240,50 +243,52 @@ def deal_with_win(players, i, pot_amount):
 # Takes in the amount of money in the pot.
 # The dealer index is used to keep track in which part of the loop we start
 # this is used to handle the fact the dealer changes each round.
+
+# We have removed cashed out players so now we need to remove players in this loop.
 def Round_of_Betting(players, pot_amount,dealer_index=0):
-    i = dealer_index
-    loop = True
-    number_of_players = len(players)
-    check_count = 0
-    fold_count = 0
-    # This is the amount players need to put in to call the raise
+    # This is a loop that all allows each player to make thier choice
+    i=0
     call_amount = 0
-    while loop:
-        fold_count = 0
-        check_or_call = 0
-        # This will break the loop if all but one players has folded.
-        # or if all players have called
-        for player in players:
-            if player.previous_move == 'fold':
-                fold_count += 1
-            if player.previous_move == 'check_or_call':
-                check_or_call +=1
+    while i < len(players):
 
-        # When the number of players that have folded or have raised is one less the number of players we break
-        if check_or_call == number_of_players - 1:
-            break
-        if fold_count == number_of_players - 1:
-            break
+        player = players[i]
 
-        # This is a loop that all allows each player to make thier choice
-        for i in range(number_of_players):
-            player = players[(dealer_index+i)%number_of_players]
+        # This removes a player from the list if they have folded, else we increment by 1.
+        if player.previous_move == 'fold':
+            pass
+
+        # If we come back to a player that raised last we break the loop
+        if player.previous_move == 'raise':
+            break
+        
+        if player.previous_move != 'fold':
             player.previous_move, pot_amount, call_amount = player.make_move(pot_amount, call_amount)
 
-            # Resets all players previous move to None.
-            # We keep current players move as raise.
-            if player.previous_move == 'raise':
-                    for p in players:
-                        if p != player:
-                            p.previous_move = None
-                    
-            i = (i+1)%len(players)
+        # This make it so all players other then the current player have previous move none.
+        if player.previous_move == 'raise':
+            for j in range(len(players)):
+                if j == i:
+                    pass
+                else:
+                    if player.previous_move == 'fold':
+                        pass
+                    else:
+                        players[j].previous_move = None
 
-        # deal with exit condititions.
-        for player in players:
-            player.previous_move = None
 
-        return players, pot_amount
+
+        # If all but one players have folded.            
+        if len(players) <= 1:
+            break
+
+        # We now deal with the call.
+
+        i = (i+1)%len(players)
+
+        if player.chips <= 0:
+            player.previous_move = 'fold'
+
+    return players, pot_amount
 
 # I need a function that determines the winner then gives the pot to the player with the strongest card.
 # It must be able to deal with ties and side bets.
